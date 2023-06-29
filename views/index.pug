@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+    title Mi Aplicación
+  body
+    h1 Mi Aplicación
+    h2 Datos existentes
+    ul
+      each dato in datos
+        li= dato.nombre
+    h2 Agregar nuevo dato
+    form(action="/" method="POST")
+      input(type="text" name="nuevoDato" placeholder="Ingrese un nuevo dato")
+      button(type="submit") Agregar

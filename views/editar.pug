@@ -1,0 +1,14 @@
+block content
+  form(action=`/actualizar/${alumno && alumno.id}`, method='post')
+      h1 Editar Alumno
+      p
+        | Nombre
+        input(type='text', name='editarDato', value=alumno && alumno.nombre)
+      p
+        | Edad
+        input(type='number', name='editarEdad', value=alumno && alumno.edad)
+      p
+        | Comentario
+        textarea(name='editarComentario') #{alumno.comentario}
+      p
+        button(type='submit') Actualizar

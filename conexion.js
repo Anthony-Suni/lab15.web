@@ -1,72 +1,114 @@
-const mysql = require('mysql');
-const express = require('express');
+const express = require("express");
 const app = express();
-const port = 6661; // Puedes ajustar el número de puerto según tus necesidades
+const port = 6661;
+const mysql = require("mysql");
 
-// Configurar Pug como motor de plantillas
-app.set('view engine', 'pug');
-app.set('views', './views');
+app.set("view engine", "pug");
+app.set("views", "./views");
 
-// Configurar Express.js para servir archivos estáticos desde la carpeta "public"
-app.use(express.static('public'));
-
-// Middleware para procesar datos enviados en formularios
+app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 
-// Configuración de la conexión a MySQL
 const connection = mysql.createConnection({
-  host: 'localhost',
+  host: "localhost",
   port: 3306,
-  user: 'root',
-  password: '123456',
-  database: 'laboratorio15'
+  user: "root",
+  password: "123456",
+  database: "laboratorio15",
 });
 
-// Conexión a la base de datos
 connection.connect((error) => {
   if (error) {
-    console.error('Error al conectar a MySQL: ', error);
+    console.error("Error al conectar a MySQL: ", error);
     return;
   }
-  console.log('Conexión exitosa a MySQL');
+  console.log("Conexión exitosa a MySQL");
 
-  // Ruta principal
-  app.get('/', (req, res) => {
-    // Realizar consulta a la base de datos
-    connection.query('SELECT * FROM alumnos', (error, resultados) => {
+  app.get("/", (req, res) => {
+    connection.query("SELECT * FROM alumnos", (error, resultados) => {
       if (error) {
-        console.error('Error al obtener los datos: ', error);
+        console.error("Error al obtener los datos: ", error);
         return;
       }
-      // Renderizar la vista y pasar los resultados a través del objeto locals
-      res.render('index', { datos: resultados });
+      res.render("index", { datos: resultados });
     });
   });
 
-  // Manejar la solicitud POST para agregar datos
-  app.post('/', (req, res) => {
+  app.get("/editar/:id", (req, res) => {
+    const id = req.params.id;
+
+    // Realizar consulta a la base de datos para obtener los datos del registro con el ID especificado
+    connection.query(
+      "SELECT * FROM alumnos WHERE id = ?",
+      [id],
+      (error, resultados) => {
+        if (error) {
+          console.error("Error al obtener los datos: ", error);
+          return;
+        }
+        const alumno = resultados[0]; // Obtener el primer registro de los resultados
+        res.render("editar", { alumno: alumno });
+      }
+    );
+  });
+
+  app.post("/actualizar/:id", (req, res) => {
+    const id = req.params.id;
+    const nuevoDato = req.body.editarDato;
+    const nuevaEdad = req.body.editarEdad;
+    const nuevoComentario = req.body.editarComentario;
+
+    const consulta =
+      "UPDATE alumnos SET nombre = ?, edad = ?, comentario = ? WHERE id = ?";
+    connection.query(
+      consulta,
+      [nuevoDato, nuevaEdad, nuevoComentario, id],
+      (error, results) => {
+        if (error) {
+          console.error("Error al actualizar datos: ", error);
+          return;
+        }
+        console.log("Dato actualizado exitosamente");
+        res.redirect("/");
+      }
+    );
+  });
+
+  app.post("/", (req, res) => {
     const nuevoDato = req.body.nuevoDato;
-    // Aquí puedes agregar el código para insertar el nuevo dato en la base de datos
+    const nuevaEdad = req.body.nuevaEdad;
+    const nuevoComentario = req.body.nuevoComentario;
+    const consulta =
+      "INSERT INTO alumnos (nombre, edad, comentario) VALUES (?, ?, ?)";
+    connection.query(
+      consulta,
+      [nuevoDato, nuevaEdad, nuevoComentario],
+      (error, results) => {
+        if (error) {
+          console.error("Error al insertar datos: ", error);
+          return;
+        }
+        console.log("Dato insertado exitosamente");
+        res.redirect("/");
+      }
+    );
+  });
 
-    // Consulta SQL de inserción
-    const consulta = 'INSERT INTO alumnos (nombre, edad, comentario) VALUES (?, ?, ?)';
-
-    // Ejecutar la consulta de inserción
-    connection.query(consulta, [nuevoDato, 0, ''], (error, results) => {
+  app.post("/eliminar/:id", (req, res) => {
+    const id = req.params.id;
+    const consulta = "DELETE FROM alumnos WHERE id = ?";
+    connection.query(consulta, [id], (error, results) => {
       if (error) {
-        console.error('Error al insertar datos: ', error);
+        console.error("Error al eliminar dato: ", error);
         return;
       }
-      console.log('Dato insertado exitosamente');
-      res.redirect('/');
+      console.log("Dato eliminado exitosamente");
+      res.redirect("/");
     });
   });
-
-  // Iniciar el servidor
-  app.listen(port, () => {
-    console.log(`Servidor en ejecución en http://localhost:${port}`);
-  });
+  
 });
 
-// Cerrar la conexión cuando sea necesario
-// connection.end();
+app.listen(port, () => {
+  console.log(`Servidor en ejecución en http://localhost:${port}`);
+});

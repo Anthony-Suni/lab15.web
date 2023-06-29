@@ -1,14 +1,78 @@
 doctype html
 html
   head
-    title Mi Aplicación
+    title Lista de Alumnos
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/js/bootstrap.min.js')
+    script.
+      function validateForm() {
+        var nombreInput = document.getElementById('nuevoDato');
+        var edadInput = document.getElementById('nuevaEdad');
+        var comentarioInput = document.getElementById('nuevoComentario');
+        var form = document.getElementById('myForm');
+
+        if (nombreInput.value.trim() === '') {
+          nombreInput.classList.add('is-invalid');
+          return false;
+        }
+
+        if (edadInput.value.trim() === '') {
+          edadInput.classList.add('is-invalid');
+          return false;
+        }
+
+        if (comentarioInput.value.trim() === '') {
+          comentarioInput.classList.add('is-invalid');
+          return false;
+        }
+
+        form.classList.add('was-validated');
+        return true;
+      }
+    style.
+      .datos {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
   body
-    h1 Mi Aplicación
-    h2 Datos existentes
-    ul
-      each dato in datos
-        li= dato.nombre
-    h2 Agregar nuevo dato
-    form(action="/" method="POST")
-      input(type="text" name="nuevoDato" placeholder="Ingrese un nuevo dato")
-      button(type="submit") Agregar
+    .container
+      h1 Lista de Alumnos
+      div(class='datos')
+        table(class='table')
+          thead
+            tr
+              th Nombre
+              th Edad
+              th Comentario
+              th Acciones
+          tbody
+            each dato in datos
+              tr
+                td= dato.nombre
+                td= dato.edad
+                td= dato.comentario
+                td
+                  a(href=`/editar/${dato.id}`) Editar
+                td
+                  form(action=`/eliminar/${dato.id}`, method='post')
+                    button(type='submit', class='btn btn-danger') Eliminar
+      form(id='myForm', action='/', method='post', onsubmit='return validateForm()', class='needs-validation', novalidate)
+        h2 Agregar nuevo dato
+        p
+          label(for='nuevoDato') Nombre
+          input(id='nuevoDato', type='text', name='nuevoDato', class='form-control')
+          div(class='invalid-feedback')
+            | Por favor ingrese el nombre.
+        p
+          label(for='nuevaEdad') Ingrese la edad
+          input(id='nuevaEdad', type='number', name='nuevaEdad', class='form-control')
+          div(class='invalid-feedback')
+            | Por favor ingrese la edad.
+        p
+          label(for='nuevoComentario') Ingrese un comentario
+          textarea(id='nuevoComentario', name='nuevoComentario', rows='3', class='form-control')
+          div(class='invalid-feedback')
+            | Por favor ingrese un comentario.
+        p
+          input(type='submit', value='Agregar', class='btn btn-primary')

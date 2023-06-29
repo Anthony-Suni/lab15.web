@@ -1,14 +1,42 @@
 block content
-  form(action=`/actualizar/${alumno && alumno.id}`, method='post')
+  .d-flex.justify-content-center.align-items-center.min-vh-100
+    form(action=`/actualizar/${alumno && alumno.id}`, method='post', onsubmit='return validateForm()', class='needs-validation', novalidate)
       h1 Editar Alumno
       p
-        | Nombre
-        input(type='text', name='editarDato', value=alumno && alumno.nombre)
+        label(for='editarDato') Nombre
+        input(id='editarDato', type='text', name='editarDato', value=alumno && alumno.nombre, class='form-control')
+        div(class='invalid-feedback')
+          | Por favor ingrese el nombre.
       p
-        | Edad
-        input(type='number', name='editarEdad', value=alumno && alumno.edad)
+        label(for='editarEdad') Edad
+        input(id='editarEdad', type='number', name='editarEdad', value=alumno && alumno.edad, class='form-control')
+        div(class='invalid-feedback')
+          | Por favor ingrese la edad.
       p
-        | Comentario
-        textarea(name='editarComentario') #{alumno.comentario}
+        label(for='editarComentario') Comentario
+        textarea(id='editarComentario', name='editarComentario', class='form-control') #{alumno && alumno.comentario}
       p
-        button(type='submit') Actualizar
+        button(type='submit', class='btn btn-primary') Actualizar
+
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/js/bootstrap.min.js')
+  script.
+    function validateForm() {
+      var nombreInput = document.getElementById('editarDato');
+      var edadInput = document.getElementById('editarEdad');
+      var form = document.querySelector('form.needs-validation');
+
+      if (nombreInput.value.trim() === '') {
+        nombreInput.classList.add('is-invalid');
+        return false;
+      }
+
+      if (edadInput.value.trim() === '') {
+        edadInput.classList.add('is-invalid');
+        return false;
+      }
+
+      form.classList.add('was-validated');
+      return true;
+    }
+
+  link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css')
